@@ -1,7 +1,8 @@
 .env
-/vendor/
+# Downloadable dependencies (keep manifests and lockfiles committed)
+vendor/
+node_modules/
+composer.phar
 /storage/*
 !/storage/.gitkeep
-/tools/composer.phar
-/tools/node_modules/
 /tests/results/
