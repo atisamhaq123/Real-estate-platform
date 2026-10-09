@@ -1,0 +1,1 @@
+<div class="error-wrap"><span class="eyebrow">VEYRA ESTATES · <?= e($data['code']) ?></span><h1><?= e($title) ?></h1><p><?= e($data['message']) ?></p><a class="button" href="<?= $data['code']===401?'/login':'/' ?>"><?= $data['code']===401?'Sign in':'Return home' ?> <?= icon('arrow') ?></a><button class="button outline" data-back>Go back</button></div>

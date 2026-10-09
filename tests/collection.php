@@ -1,0 +1,21 @@
+<?php
+putenv('DB_DATABASE=aurelle_test_collection_'.date('Ymd_His').'_'.bin2hex(random_bytes(3)));
+putenv('APP_ENV=local'); putenv('DEMO_PASSWORD=IsolatedDemoPass123!');
+require_once dirname(__DIR__).'/app/bootstrap.php';
+use Aurelle\Database as DB;
+use Aurelle\Services\DemoProperties;
+use Aurelle\Services\Platform;
+ob_start(); require ROOT.'/bin/migrate.php'; require ROOT.'/bin/seed.php'; ob_end_clean();
+$original=DB::all('SELECT id,title,price_minor,status FROM listings ORDER BY id');
+$result=DemoProperties::populate();
+if ($result['created']!==120 || $result['public_total']!==126) throw new RuntimeException('Incorrect collection size.');
+if ($original!==DB::all('SELECT id,title,price_minor,status FROM listings WHERE id<=6 ORDER BY id')) throw new RuntimeException('Original listings changed.');
+foreach (DB::all('SELECT l.property_type,COUNT(*) n FROM listings l JOIN demo_listing_seeds s ON s.listing_id=l.id GROUP BY l.property_type') as $r) if ((int)$r['n']!==12) throw new RuntimeException('Unbalanced property categories.');
+$totals=DB::all('SELECT l.purpose,COUNT(*) n FROM listings l JOIN demo_listing_seeds s ON s.listing_id=l.id GROUP BY l.purpose');
+$totals=array_column($totals,'n','purpose'); if ((int)$totals['sale']!==80 || (int)$totals['rent']!==40) throw new RuntimeException('Incorrect sale/rental mix.');
+if ((int)DB::one('SELECT COUNT(*) n FROM listing_media m JOIN demo_listing_seeds s ON s.listing_id=m.listing_id')['n']!==360) throw new RuntimeException('Missing gallery records.');
+if (Platform::search(['type'=>'House'])['total']!==12 || Platform::search(['type'=>'Studio'])['total']!==12) throw new RuntimeException('New categories cannot be filtered.');
+$ids=[]; for($page=1;$page<=14;$page++) foreach(Platform::search(['page'=>$page])['items'] as $listing) $ids[]=$listing['id'];
+if (count($ids)!==126 || count(array_unique($ids))!==126) throw new RuntimeException('Pagination skipped or repeated listings.');
+$repeat=DemoProperties::populate(); if ($repeat['created']!==0 || $repeat['already_present']!==120 || $repeat['public_total']!==126) throw new RuntimeException('Collection import is not idempotent.');
+echo "Collection checks passed: 120 additions, 126 total, 10 balanced categories, 80 sale / 40 rent, 360 gallery records, category filters, unique pagination, preserved original records, duplicate-free rerun.\nIsolated database: ".env('DB_DATABASE').PHP_EOL;

@@ -1,0 +1,1 @@
+{"private":true,"description":"Optional browser acceptance tooling only; application remains core PHP","devDependencies":{"playwright":"^1.56.0","ws":"^8.18.0"},"scripts":{"test":"node ../tests/browser.mjs"}}

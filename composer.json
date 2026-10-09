@@ -1,0 +1,6 @@
+{
+  "name": "aurelle/estates",
+  "description": "Core PHP luxury property platform",
+  "require": {"php": ">=8.2", "ext-pdo": "*", "ext-pdo_mysql": "*", "ext-fileinfo": "*", "workerman/workerman": "^5.1"},
+  "autoload": {"psr-4": {"Aurelle\\": "app/"}}
+}

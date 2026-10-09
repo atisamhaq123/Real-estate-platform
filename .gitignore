@@ -1,0 +1,7 @@
+.env
+/vendor/
+/storage/*
+!/storage/.gitkeep
+/tools/composer.phar
+/tools/node_modules/
+/tests/results/
